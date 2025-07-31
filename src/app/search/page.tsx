@@ -1,32 +1,22 @@
 "use client";
+
 import Categories from "@/components/categories/categories";
-import { useFetchBooksByValue } from "@/hooks/useFetchBooksByValue";
-import {
-	Alert,
-	Box,
-	Heading,
-	Input,
-	InputGroup,
-	Text,
-	VStack,
-} from "@chakra-ui/react";
-import { NextPage } from "next";
-import { useState } from "react";
-import { LuSearch } from "react-icons/lu";
+import {Box, Heading, Input, InputGroup, Text, VStack} from "@chakra-ui/react";
+import {NextPage} from "next";
+import {useState} from "react";
+import {LuSearch} from "react-icons/lu";
 import BooksListRow from "./booksListRow";
 import SkeletonBooksRow from "./skeletonBooksRow";
-import { AlertPortal } from "@/components/alertPortal/alertPortal";
-import { categories } from "@/utils/categories";
+import {AlertPortal} from "@/components/alertPortal/alertPortal";
+import {categories} from "@/utils/categories";
+import {useInfiniteSearchBooks} from "@/hooks/useFetchInfinitiSearchBooks";
 
-interface Props {}
-
-const Page: NextPage<Props> = ({}) => {
+const Page: NextPage = () => {
 	const [searchValue, setSearchValue] = useState("");
-
-	const { books, ok, error, loading } = useFetchBooksByValue(searchValue);
+	const {books, loading, error, ok, hasMore, loadMore} = useInfiniteSearchBooks(searchValue);
 
 	return (
-		<div style={{ maxWidth: "800px", margin: "100px auto" }}>
+		<div style={{maxWidth: "800px", margin: "100px auto"}}>
 			<InputGroup flex="1" startElement={<LuSearch />}>
 				<Input
 					placeholder="Книга"
@@ -37,7 +27,7 @@ const Page: NextPage<Props> = ({}) => {
 				/>
 			</InputGroup>
 
-			{loading && (
+			{loading && books.length === 0 && (
 				<VStack gap={4} mt={6}>
 					{[...Array(3)].map((_, i) => (
 						<SkeletonBooksRow key={i} id={i} />
@@ -50,13 +40,11 @@ const Page: NextPage<Props> = ({}) => {
 				message={error || "Произошла ошибка"}
 			/>
 
-			{!loading &&
-				searchValue.length > 0 &&
-				(books?.length ? (
-					<BooksListRow books={books} />
-				) : (
-					<Text>Нет книг</Text>
-				))}
+			{books.length > 0 ? (
+				<BooksListRow loading={loading} books={books} loadMore={loadMore} hasMore={hasMore} />
+			) : (
+				!loading && searchValue.trim().length > 0 && <Text mt={5}>Нет книг</Text>
+			)}
 
 			{searchValue.trim().length === 0 && (
 				<Box pt={10}>

@@ -1,6 +1,6 @@
-import { AxiosError } from "axios";
+import {AxiosError} from "axios";
 import api from "./api";
-import { IBook } from "@/types/books.interfaces";
+import {IBook} from "@/types/books.interfaces";
 
 type BookApiResponse = {
 	data?: IBook[];
@@ -34,7 +34,7 @@ const fetchBooks = async (params: BookApiParams): Promise<BookApiResponse> => {
 		if (subject) {
 			q = `subject:${subject}`;
 		} else if (!query) {
-			q = "*";
+			q = "book";
 		}
 
 		const url =
@@ -45,7 +45,7 @@ const fetchBooks = async (params: BookApiParams): Promise<BookApiResponse> => {
 			(langRestrict ? `&langRestrict=${langRestrict}` : "");
 
 		const res = await api.get(url);
-		return { data: res.data.items, ok: true };
+		return {data: res.data.items, ok: true};
 	} catch (e) {
 		const error = e as AxiosError;
 		return {
@@ -64,7 +64,7 @@ export const booksServices = {
 		} = {}
 	) => {
 		return fetchBooks({
-			query: "*",
+			query: "book",
 			maxResults: options.limit,
 			orderBy: options.order,
 			langRestrict: options.lang,
@@ -78,21 +78,19 @@ export const booksServices = {
 		});
 	},
 
-	searchBooks: async (query: string, limit: number = 5) => {
-		return fetchBooks({
-			query: `intitle:${query}`,
-			maxResults: limit,
-		});
-	},
+	searchBooks: async (query: string, limit: number = 5, startIndex: number = 0) => {
+	return fetchBooks({
+		query: `intitle:${query}`,
+		maxResults: limit,
+		startIndex,
+	});
+},
 
-	getBooksPaginated: async (
-		category: string,
-		startIndex: number,
-		limit: number = 12
-	) => {
+
+	getBooksPaginated: async (category: string, startIndex: number, limit: number = 12) => {
 		if (category === "all") {
 			return fetchBooks({
-				query: "*",
+				query: "book",
 				maxResults: limit,
 				startIndex,
 				orderBy: "newest",

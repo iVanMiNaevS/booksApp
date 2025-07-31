@@ -1,6 +1,6 @@
 "use client";
-import { Text } from "@chakra-ui/react";
-import { NextPage } from "next";
+import {Text} from "@chakra-ui/react";
+import {NextPage} from "next";
 import Link from "next/link";
 
 interface Props {
@@ -8,9 +8,9 @@ interface Props {
 	href: string;
 }
 
-const NavLink: NextPage<Props> = ({ children, href }) => {
+const NavLink: NextPage<Props> = ({children, href}) => {
 	return (
-		<Link href={href}>
+		<Link href={href} prefetch>
 			<Text
 				px={2}
 				py={1}
